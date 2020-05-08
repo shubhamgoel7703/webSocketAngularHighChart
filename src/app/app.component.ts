@@ -45,6 +45,8 @@ export class AppComponent implements OnInit {
 
     this.socket.on('sendData', (message) => {
       // this.chartOptions.series[0].data.push(message)
+      console.log("message ", message);
+
       try {
         var jsonMessage = JSON.parse(message);
         if (jsonMessage && jsonMessage.d) {
@@ -63,19 +65,35 @@ export class AppComponent implements OnInit {
     //     "Temperature_Node_0": 29.40, "Humidity_Node_0": 68.40, "Acceleration_Z_Node_0": 0.98
     //   }
     // }
-    // for (let i = 0; i < 3; i++) {
+    // for (let i = 0; i < 20; i++) {
+    //   obj.d.Temperature_Node_0 = i;
     //   this.chartSeriesAdded(obj.d);
     // }
   }
 
 
   chartSeriesAdded(incomingObject) {
-    incomingObject.Temperature_Node_0 ? this.temperatureChartOptions.series[0].data.push(incomingObject.Temperature_Node_0) : console.error("incomingObject is ", incomingObject);
-    incomingObject.Acceleration_X_Node_0 ? this.xAxisChartOptions.series[0].data.push(incomingObject.Acceleration_X_Node_0) : '';
-    incomingObject.Acceleration_Y_Node_0 ? this.yAxisChartOptions.series[0].data.push(incomingObject.Acceleration_Y_Node_0) : '';
-    incomingObject.Acceleration_Z_Node_0 ? this.zAxisChartOptions.series[0].data.push(incomingObject.Acceleration_Z_Node_0) : '';
+    incomingObject.Temperature_Node_0 || incomingObject.Temperature_Node_0 == 0 ? this.temperatureChartOptions.series[0].data.push(incomingObject.Temperature_Node_0) : console.error("incomingObject is ", incomingObject);
+    incomingObject.Acceleration_X_Node_0 || incomingObject.Acceleration_X_Node_0 == 0 ? this.xAxisChartOptions.series[0].data.push(incomingObject.Acceleration_X_Node_0) : '';
+    incomingObject.Acceleration_Y_Node_0 || incomingObject.Acceleration_Y_Node_0 == 0 ? this.yAxisChartOptions.series[0].data.push(incomingObject.Acceleration_Y_Node_0) : '';
+    incomingObject.Acceleration_Z_Node_0 || incomingObject.Acceleration_Z_Node_0 == 0 ? this.zAxisChartOptions.series[0].data.push(incomingObject.Acceleration_Z_Node_0) : '';
+
+    if (this.temperatureChartOptions.series[0].data.length > 10) {
+      this.temperatureChartOptions.series[0].data.shift(); // removes the first element from an array 
+    }
+
+    this.arrayShiftingLogic(this.temperatureChartOptions.series[0].data);
+    this.arrayShiftingLogic(this.xAxisChartOptions.series[0].data);
+    this.arrayShiftingLogic(this.yAxisChartOptions.series[0].data);
+    this.arrayShiftingLogic(this.zAxisChartOptions.series[0].data);
 
     this.updateFlag = true;
+  }
+
+  arrayShiftingLogic(array) {
+    if (array.length > 10) {
+      array.shift(); // removes the first element from an array 
+    }
   }
 
   initializeChartOptions() {
@@ -89,7 +107,7 @@ export class AppComponent implements OnInit {
 
 
 
-  initializeSingleChartOption(title, subtitle, xAxisText, yAxisText, color): {} {
+  initializeSingleChartOption(title, subtitle, yAxisText, xAxisText, color): {} {
     return {
       chart: {
         zoomType: 'x'
