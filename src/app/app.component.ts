@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
   chartCallback = function (chart) { } // optional function, defaults to null
   updateFlag = false; // optional boolean
   oneToOneFlag = true; // optional boolean, defaults to false
-  runOutsideAngular = false; // optional boolean, defaults to false
+  runOutsideAngularFlag = false; // optional boolean, defaults to false
 
 
   topic = 'vibrationDataTopic'
