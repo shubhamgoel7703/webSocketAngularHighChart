@@ -17,105 +17,141 @@ export class AppComponent implements OnInit {
 
   highcharts = Highcharts; // required
   chartConstructor = 'chart'; // optional string, defaults to 'chart'
-  chartOptions = {
-    chart: {
-      zoomType: 'x'
-    },
-
-    title: {
-      text: 'Vibration Analysis'
-    },
-    subtitle: {
-      text: 'Amplitude vs Frequency chart'
-    },
-
-    series: [{
-      data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
-    }],
-
-    xAxis: {
-      tickInterval: 0.5,
-      gridLineWidth: 1,
-      title: {
-        enabled: true,
-        text: 'Frequency',
-        style: {
-          fontWeight: 'normal'
-        }
-      }
-    },
-
-    yAxis: {
-      title: {
-        enabled: true,
-        text: 'Amplitute',
-        style: {
-          fontWeight: 'normal'
-        }
-      }
-    },
-
-    annotations: [{
-      labels: [{
-        point: {
-          x: 3,
-          y: 129.2,
-          xAxis: 0,
-          yAxis: 0
-        },
-        text: 'x: {x}<br/>y: {y}'
-      },
-      {
-        point: {
-          x: 0,
-          y: 0
-        },
-        text: 'x: {point.plotX} px<br/>y: {point.plotY} px'
-      },
-      {
-        point: {
-          x: 5,
-          y: 100,
-          xAxis: 0
-        },
-        text: 'x: {x}<br/>y: {point.plotY} px'
-      }],
-      labelOptions: {
-        x: 40, y: -10
-      }
-    }]
-  }; // required
+  temperatureChartOptions;
+  xAxisChartOptions;
+  yAxisChartOptions;
+  zAxisChartOptions;
+  fftChartOptions;
   chartCallback = function (chart) { } // optional function, defaults to null
   updateFlag = false; // optional boolean
   oneToOneFlag = true; // optional boolean, defaults to false
   runOutsideAngular = false; // optional boolean, defaults to false
 
 
-  topic = 'LINTANGtest123'
-  private url = 'http://localhost:2222';
+  topic = 'vibrationDataTopic'
+  private url = 'http://13.234.202.176:2222';
   private socket;
   constructor() {
+
     this.socket = io(this.url);
   }
 
+  // {"d":{"myName":"Node6LoWPAN","MAX_Temperature_Node_0":29.30,"Button_Counter_Node_0":0,
+  //   "Temperature_Node_0":29.40,"Humidity_Node_0":68.40,"Acceleration_Z_Node_0":0.98}}
 
   ngOnInit() {
-    // setInterval(() => {
-    //   // this.highcharts
-    //   console.log(this.updateFlag, this.chartOptions.series[0].data)
-    //   this.chartOptions.series[0].data.push(100)
-    //   this.updateFlag = true;
-    //   console.log(this.updateFlag, this.chartOptions.series[0].data)
-    // }, 3000);
+
+    this.initializeChartOptions();
 
     this.socket.on('sendData', (message) => {
-      this.chartOptions.series[0].data.push(message)
-      this.updateFlag = true;
+      // this.chartOptions.series[0].data.push(message)
+      this.chartSeriesAdded(message.d)
       console.log(message);
     });
+
+    // let obj = {
+    //   "d": {
+    //     "myName": "Node6LoWPAN", "MAX_Temperature_Node_0": 29.30, "Button_Counter_Node_0": 0,
+    //     "Temperature_Node_0": 29.40, "Humidity_Node_0": 68.40, "Acceleration_Z_Node_0": 0.98
+    //   }
+    // }
+    // for (let i = 0; i < 3; i++) {
+    //   this.chartSeriesAdded(obj.d);
+    // }
   }
 
 
+  chartSeriesAdded(incomingObject) {
+    incomingObject.Temperature_Node_0 ? this.temperatureChartOptions.series[0].data.push(incomingObject.Temperature_Node_0) : console.error("incomingObject is ", incomingObject);
+    incomingObject.Acceleration_X_Node_0 ? this.xAxisChartOptions.series[0].data.push(incomingObject.Acceleration_X_Node_0) : '';
+    incomingObject.Acceleration_Y_Node_0 ? this.yAxisChartOptions.series[0].data.push(incomingObject.Acceleration_Y_Node_0) : '';
+    incomingObject.Acceleration_Z_Node_0 ? this.zAxisChartOptions.series[0].data.push(incomingObject.Acceleration_Z_Node_0) : '';
+
+    this.updateFlag = true;
+  }
+
+  initializeChartOptions() {
+    this.temperatureChartOptions = this.initializeSingleChartOption('Temperature Analysis', "Temperature Vs Time", "Temperature", "Time", '#FF0000');
+    this.xAxisChartOptions = this.initializeSingleChartOption('X Axis Analysis', "Movement Vs Time", "Movement", "Time", '#AA0000');
+    this.yAxisChartOptions = this.initializeSingleChartOption('Y Axis Analysis', "Movement Vs Time", "Movement", "Time", '#0000FF');
+    this.zAxisChartOptions = this.initializeSingleChartOption('Z Axis Analysis', "Movement Vs Time", "Movement", "Time", '#00FF00');
+    this.fftChartOptions = this.initializeSingleChartOption('Vibration Analysis', "Amplitude Vs Frequency", "Amplitude", "Frequency", '#0F00F0');
+    this.updateFlag = true;
+  }
+
+
+
+  initializeSingleChartOption(title, subtitle, xAxisText, yAxisText, color): {} {
+    return {
+      chart: {
+        zoomType: 'x'
+      },
+
+      title: {
+        text: title//'Vibration Analysis'
+      },
+      subtitle: {
+        text: subtitle//'Amplitude vs Frequency chart'
+      },
+
+      series: [{
+        color: color,
+        data: [0, 0]
+      }],
+
+      xAxis: {
+        tickInterval: 0.5,
+        gridLineWidth: 1,
+        title: {
+          enabled: true,
+          text: xAxisText,//'Frequency',
+          style: {
+            fontWeight: 'normal'
+          },
+        }
+      },
+
+      yAxis: {
+        title: {
+          enabled: true,
+          text: yAxisText,//'Amplitute',
+          style: {
+            fontWeight: 'normal'
+          }
+        }
+      },
+
+      annotations: [{
+        labels: [{
+          point: {
+            x: 3,
+            y: 129.2,
+            xAxis: 0,
+            yAxis: 0
+          },
+          text: 'x: {x}<br/>y: {y}'
+        },
+        {
+          point: {
+            x: 0,
+            y: 0
+          },
+          text: 'x: {point.plotX} px<br/>y: {point.plotY} px'
+        },
+        {
+          point: {
+            x: 5,
+            y: 100,
+            xAxis: 0
+          },
+          text: 'x: {x}<br/>y: {point.plotY} px'
+        }],
+        labelOptions: {
+          x: 40, y: -10
+        }
+      }]
+    }; // required
+  }
 
 
 }
