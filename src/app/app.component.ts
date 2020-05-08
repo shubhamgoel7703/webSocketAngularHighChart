@@ -45,8 +45,16 @@ export class AppComponent implements OnInit {
 
     this.socket.on('sendData', (message) => {
       // this.chartOptions.series[0].data.push(message)
-      this.chartSeriesAdded(message.d)
-      console.log(message);
+      try {
+        var jsonMessage = JSON.parse(message);
+        if (jsonMessage && jsonMessage.d) {
+          this.chartSeriesAdded(jsonMessage.d)
+        }
+        console.log(jsonMessage);
+      }
+      catch (ex) {
+        console.error("exception ", ex);
+      }
     });
 
     // let obj = {
