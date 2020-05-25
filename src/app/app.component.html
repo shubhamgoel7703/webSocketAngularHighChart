@@ -19,24 +19,35 @@
 </ul> -->
 
 <div class='row'>
-
-  <highcharts-chart class='col-md-6' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="temperatureChartOptions"
+  <!-- Temp -->
+  <highcharts-chart class='col-md-4' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="temperatureChartOptions"
     [callbackFunction]="chartCallback" [(update)]="updateFlag" [oneToOne]="oneToOneFlag" [runOutsideAngular]="runOutsideAngularFlag"
     style="width: 100%; height: 400px; display: block;"></highcharts-chart>
 
-  <highcharts-chart class='col-md-6' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="xAxisChartOptions"
+  <highcharts-chart class='col-md-4' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="xAxisChartOptions"
     [callbackFunction]="chartCallback" [(update)]="updateFlag" [oneToOne]="oneToOneFlag" [runOutsideAngular]="runOutsideAngularFlag"
     style="width: 100%; height: 400px; display: block;"></highcharts-chart>
 
-  <highcharts-chart class='col-md-6' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="yAxisChartOptions"
+  <highcharts-chart class='col-md-4' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="yAxisChartOptions"
     [callbackFunction]="chartCallback" [(update)]="updateFlag" [oneToOne]="oneToOneFlag" [runOutsideAngular]="runOutsideAngularFlag"
     style="width: 100%; height: 400px; display: block;"></highcharts-chart>
 
-  <highcharts-chart class='col-md-6' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="zAxisChartOptions"
+  <highcharts-chart class='col-md-4' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="zAxisChartOptions"
     [callbackFunction]="chartCallback" [(update)]="updateFlag" [oneToOne]="oneToOneFlag" [runOutsideAngular]="runOutsideAngularFlag"
     style="width: 100%; height: 400px; display: block;"></highcharts-chart>
 
-  <highcharts-chart class='col-md-6' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="fftChartOptions"
+  <div class='col-md-8'>
+  </div>
+
+  <highcharts-chart class='col-md-4' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="xAxisFFTChartOptions"
+    [callbackFunction]="chartCallback" [(update)]="updateFlag" [oneToOne]="oneToOneFlag" [runOutsideAngular]="runOutsideAngularFlag"
+    style="width: 100%; height: 400px; display: block;"></highcharts-chart>
+
+  <highcharts-chart class='col-md-4' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="yAxisFFTChartOptions"
+    [callbackFunction]="chartCallback" [(update)]="updateFlag" [oneToOne]="oneToOneFlag" [runOutsideAngular]="runOutsideAngularFlag"
+    style="width: 100%; height: 400px; display: block;"></highcharts-chart>
+
+  <highcharts-chart class='col-md-4' [Highcharts]="highcharts" [constructorType]="chartConstructor" [options]="zAxisFFTChartOptions"
     [callbackFunction]="chartCallback" [(update)]="updateFlag" [oneToOne]="oneToOneFlag" [runOutsideAngular]="runOutsideAngularFlag"
     style="width: 100%; height: 400px; display: block;"></highcharts-chart>
 
