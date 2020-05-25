@@ -21,7 +21,9 @@ export class AppComponent implements OnInit {
   xAxisChartOptions;
   yAxisChartOptions;
   zAxisChartOptions;
-  fftChartOptions;
+  xAxisFFTChartOptions;
+  yAxisFFTChartOptions
+  zAxisFFTChartOptions
   chartCallback = function (chart) { } // optional function, defaults to null
   updateFlag = false; // optional boolean
   oneToOneFlag = true; // optional boolean, defaults to false
@@ -29,10 +31,10 @@ export class AppComponent implements OnInit {
 
 
   topic = 'vibrationDataTopic'
-  private url = 'http://13.234.202.176:2222';
+  private url = 'http://localhost:2222'//'http://13.234.202.176:2222';
   private socket;
+  numberOfSamples = 500;
   constructor() {
-
     this.socket = io(this.url);
   }
 
@@ -59,6 +61,22 @@ export class AppComponent implements OnInit {
       }
     });
 
+
+    this.socket.on('sendFFTData', (message) => {
+      // this.chartOptions.series[0].data.push(message)
+      console.log("sendFFTData ", message);
+
+      try {
+        //  var jsonMessage = JSON.parse(message);
+        if (message) {
+          this.fftChartSeriesAdded(message)
+        }
+      }
+      catch (ex) {
+        console.error("exception ", ex);
+      }
+    });
+
     // let obj = {
     //   "d": {
     //     "myName": "Node6LoWPAN", "MAX_Temperature_Node_0": 29.30, "Button_Counter_Node_0": 0,
@@ -72,15 +90,32 @@ export class AppComponent implements OnInit {
   }
 
 
+  fftChartSeriesAdded(incomingObject) {
+    this.xAxisFFTChartOptions.series[0].data = [...this.xAxisFFTChartOptions.series[0].data, ...incomingObject.fft_X];
+    this.yAxisFFTChartOptions.series[0].data = [...this.yAxisFFTChartOptions.series[0].data, ...incomingObject.fft_Y];
+    this.zAxisFFTChartOptions.series[0].data = [...this.zAxisFFTChartOptions.series[0].data, ...incomingObject.fft_Z];
+
+    // if (this.temperatureChartOptions.series[0].data.length > this.numberOfSamples) {
+    //   this.temperatureChartOptions.series[0].data.shift(); // removes the first element from an array 
+    // }
+
+    this.arrayShiftingLogic(this.xAxisFFTChartOptions.series[0].data);
+    this.arrayShiftingLogic(this.yAxisFFTChartOptions.series[0].data);
+    this.arrayShiftingLogic(this.zAxisFFTChartOptions.series[0].data);
+
+    this.updateFlag = true;
+  }
+
+
   chartSeriesAdded(incomingObject) {
     incomingObject.Temperature_Node_0 || incomingObject.Temperature_Node_0 == 0 ? this.temperatureChartOptions.series[0].data.push(incomingObject.Temperature_Node_0) : console.error("incomingObject is ", incomingObject);
     incomingObject.Acceleration_X_Node_0 || incomingObject.Acceleration_X_Node_0 == 0 ? this.xAxisChartOptions.series[0].data.push(incomingObject.Acceleration_X_Node_0) : '';
     incomingObject.Acceleration_Y_Node_0 || incomingObject.Acceleration_Y_Node_0 == 0 ? this.yAxisChartOptions.series[0].data.push(incomingObject.Acceleration_Y_Node_0) : '';
     incomingObject.Acceleration_Z_Node_0 || incomingObject.Acceleration_Z_Node_0 == 0 ? this.zAxisChartOptions.series[0].data.push(incomingObject.Acceleration_Z_Node_0) : '';
 
-    if (this.temperatureChartOptions.series[0].data.length > 10) {
-      this.temperatureChartOptions.series[0].data.shift(); // removes the first element from an array 
-    }
+    // if (this.temperatureChartOptions.series[0].data.length > this.numberOfSamples) {
+    //   this.temperatureChartOptions.series[0].data.shift(); // removes the first element from an array 
+    // }
 
     this.arrayShiftingLogic(this.temperatureChartOptions.series[0].data);
     this.arrayShiftingLogic(this.xAxisChartOptions.series[0].data);
@@ -91,7 +126,7 @@ export class AppComponent implements OnInit {
   }
 
   arrayShiftingLogic(array) {
-    if (array.length > 10) {
+    if (array.length > this.numberOfSamples) {
       array.shift(); // removes the first element from an array 
     }
   }
@@ -101,7 +136,10 @@ export class AppComponent implements OnInit {
     this.xAxisChartOptions = this.initializeSingleChartOption('X Axis Analysis', "Movement Vs Time", "Movement", "Time", '#AA0000');
     this.yAxisChartOptions = this.initializeSingleChartOption('Y Axis Analysis', "Movement Vs Time", "Movement", "Time", '#0000FF');
     this.zAxisChartOptions = this.initializeSingleChartOption('Z Axis Analysis', "Movement Vs Time", "Movement", "Time", '#00FF00');
-    this.fftChartOptions = this.initializeSingleChartOption('Vibration Analysis', "Amplitude Vs Frequency", "Amplitude", "Frequency", '#0F00F0');
+    this.xAxisFFTChartOptions = this.initializeSingleChartOption('X Axis Vibration Analysis', "Amplitude Vs Frequency", "Amplitude", "Frequency", '#0F00F0');
+    this.yAxisFFTChartOptions = this.initializeSingleChartOption('Y Axis Vibration Analysis', "Amplitude Vs Frequency", "Amplitude", "Frequency", '#0F00F0');
+    this.zAxisFFTChartOptions = this.initializeSingleChartOption('Z Axis Vibration Analysis', "Amplitude Vs Frequency", "Amplitude", "Frequency", '#0F00F0');
+
     this.updateFlag = true;
   }
 
