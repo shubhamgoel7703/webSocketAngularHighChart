@@ -15,6 +15,16 @@ import * as io from 'socket.io-client';
 export class AppComponent implements OnInit {
   title = 'mqttAngularSubs';
 
+  fromDateTime: Date = new Date();
+  toDateTime: Date = new Date();
+
+  settings = {
+    bigBanner: true,
+    timePicker: true,
+    format: 'dd-MMM-yyyy hh:mm a',
+    defaultOpen: false
+  }
+
   highcharts = Highcharts; // required
   chartConstructor = 'chart'; // optional string, defaults to 'chart'
   temperatureChartOptions;
@@ -33,7 +43,7 @@ export class AppComponent implements OnInit {
   topic = 'vibrationDataTopic'
   private url = 'http://localhost:2222'//'http://13.234.202.176:2222';
   private socket;
-  numberOfSamples = 500;
+  numberOfSamples = 512;
   constructor() {
     this.socket = io(this.url);
   }
@@ -65,7 +75,10 @@ export class AppComponent implements OnInit {
     this.socket.on('sendFFTData', (message) => {
       // this.chartOptions.series[0].data.push(message)
       console.log("sendFFTData ", message);
-
+      if (message == "insufficient data") {
+        window.alert(message);
+        return;
+      }
       try {
         //  var jsonMessage = JSON.parse(message);
         if (message) {
@@ -99,9 +112,12 @@ export class AppComponent implements OnInit {
     //   this.temperatureChartOptions.series[0].data.shift(); // removes the first element from an array 
     // }
 
-    this.arrayShiftingLogic(this.xAxisFFTChartOptions.series[0].data);
-    this.arrayShiftingLogic(this.yAxisFFTChartOptions.series[0].data);
-    this.arrayShiftingLogic(this.zAxisFFTChartOptions.series[0].data);
+
+    // fft minimum sample is disabled for now. 
+
+    // this.arrayShiftingLogic(this.xAxisFFTChartOptions.series[0].data);
+    // this.arrayShiftingLogic(this.yAxisFFTChartOptions.series[0].data);
+    // this.arrayShiftingLogic(this.zAxisFFTChartOptions.series[0].data);
 
     this.updateFlag = true;
   }
@@ -136,9 +152,9 @@ export class AppComponent implements OnInit {
     this.xAxisChartOptions = this.initializeSingleChartOption('X Axis Analysis', "Movement Vs Time", "Movement", "Time", '#AA0000');
     this.yAxisChartOptions = this.initializeSingleChartOption('Y Axis Analysis', "Movement Vs Time", "Movement", "Time", '#0000FF');
     this.zAxisChartOptions = this.initializeSingleChartOption('Z Axis Analysis', "Movement Vs Time", "Movement", "Time", '#00FF00');
-    this.xAxisFFTChartOptions = this.initializeSingleChartOption('X Axis Vibration Analysis', "Amplitude Vs Frequency", "Amplitude", "Frequency", '#0F00F0');
-    this.yAxisFFTChartOptions = this.initializeSingleChartOption('Y Axis Vibration Analysis', "Amplitude Vs Frequency", "Amplitude", "Frequency", '#0F00F0');
-    this.zAxisFFTChartOptions = this.initializeSingleChartOption('Z Axis Vibration Analysis', "Amplitude Vs Frequency", "Amplitude", "Frequency", '#0F00F0');
+    this.xAxisFFTChartOptions = this.initializeSingleChartOption('X Axis Vibration Analysis', "Frequency Vs Time", "Frequency", "Time", '#0F00F0');
+    this.yAxisFFTChartOptions = this.initializeSingleChartOption('Y Axis Vibration Analysis', "Frequency Vs Time", "Frequency", "Time", '#0F00F0');
+    this.zAxisFFTChartOptions = this.initializeSingleChartOption('Z Axis Vibration Analysis', "Frequency Vs Time", "Frequency", "Time", '#0F00F0');
 
     this.updateFlag = true;
   }
@@ -215,6 +231,20 @@ export class AppComponent implements OnInit {
         }
       }]
     }; // required
+  }
+
+
+
+
+  searchFFT() {
+    console.log("search");
+
+    this.xAxisFFTChartOptions.series[0].data = [];
+    this.yAxisFFTChartOptions.series[0].data = [];
+    this.zAxisFFTChartOptions.series[0].data = [];
+    this.updateFlag = true;
+
+    this.socket.emit('filterDataByDatesFromDB', { from: this.fromDateTime, to: this.toDateTime });
   }
 
 
