@@ -3,9 +3,9 @@ import { NgModule } from '@angular/core';
 import { HighchartsChartModule } from 'highcharts-angular';
 
 import { AppComponent } from './app.component';
-// import { MqttModule, MqttServiceConfig, MqttService, MqttClientService } from 'ngx-mqtt';
-// import { NgxMqttClientModule } from 'ngx-mqtt-client';
+import { AngularDateTimePickerModule } from 'angular2-datetimepicker';
 
+// };
 @NgModule({
   declarations: [
     AppComponent,
@@ -14,6 +14,7 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     HighchartsChartModule,
+    AngularDateTimePickerModule
     // MqttModule,
     // MqttServiceConfig,
     // NgxMqttClientModule.withOptions({
